@@ -21,9 +21,47 @@ log = logging.getLogger(__name__)
 MONDAY_WEEKDAY = 0
 SUNDAY_WEEKDAY = 6
 
+from openedx.core.djangoapps.ace_common.message import BaseMessageType
 
-def ace_send():
-    """Just here as a mock hook for tests - drop this once we fix AA-909"""
+from edx_ace import ace
+from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.urls import reverse
+from edx_ace import ace
+from edx_ace.message import Message
+from edx_ace.recipient import Recipient
+
+
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_current_site
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+
+
+def ace_send(user, course_key):
+    """
+    Send out a account recovery email for the given user.
+
+    Arguments:
+        user (User): Django User object
+        email (str): Send email to this address.
+    """
+    site = get_current_site()
+    message_context = get_base_template_context(site)
+    message_context.update({
+        'email': 'matthewpiatetsky@gmail.com', #user.email,
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+    })
+
+    msg = Message(
+        name="goalreminderemail",
+        app_label="course_goals",
+        recipient=Recipient(user.id, 'matthewpiatetsky@gmail.com'),
+        language=get_user_preference(user, LANGUAGE_KEY),
+        context=message_context
+    )
+    ace.send(msg)
 
 
 class Command(BaseCommand):
@@ -40,6 +78,10 @@ class Command(BaseCommand):
         Helpful notes for the function:
             weekday() returns an int 0-6 with Monday being 0 and Sunday being 6
         """
+        goal = CourseGoal.objects.filter()[0]
+        import pdb; pdb.set_trace()
+        ace_send(goal.user, goal.course_key)
+        return
         today = date.today()
         sunday_date = today + timedelta(days=SUNDAY_WEEKDAY - today.weekday())
         monday_date = today - timedelta(days=today.weekday())
@@ -106,7 +148,7 @@ class Command(BaseCommand):
         if required_days_left == days_left_in_week:
             # TODO: hook up email AA-909
             # ace.send(msg)
-            ace_send()  # temporary for tests, drop with AA-909 and just mock ace.send directly
+            ace_send(goal.user, goal.course_key)  # temporary for tests, drop with AA-909 and just mock ace.send directly
             CourseGoalReminderStatus.objects.update_or_create(goal=goal, defaults={'email_reminder_sent': True})
             return True
 
