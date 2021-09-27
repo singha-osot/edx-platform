@@ -15,6 +15,6 @@ class LearnAIOAuth2(BaseOAuth2):
                 'profile_image': response[0].get('profile_image')}
 
     def user_data(self, access_token, *args, **kwargs):
-        url = 'http://ai4all.t.innosoft.kmutt.ac.th/api/user/accounts'
+        url = 'http://ai4all.t.innosoft.kmutt.ac.th/api/user/v1/accounts'
         header = {"Authorization": "Bearer %s" % access_token}
         return self.get_json(url, headers=header)
