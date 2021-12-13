@@ -4,8 +4,8 @@ from social_core.backends.oauth import BaseOAuth2
 class LearnAIOAuth2(BaseOAuth2):
     name = 'learn-ai'
     ID_KEY = 'username'
-    AUTHORIZATION_URL = 'http://ai4all.t.innosoft.kmutt.ac.th/oauth2/authorize'
-    ACCESS_TOKEN_URL = 'http://ai4all.t.innosoft.kmutt.ac.th/oauth2/access_token'
+    AUTHORIZATION_URL = 'https://learn-ai.in.th/oauth2/authorize'
+    ACCESS_TOKEN_URL = 'https://learn-ai.in.th/oauth2/access_token'
     ACCESS_TOKEN_METHOD = 'POST'
     STATE_PARAMETER = 1
 
@@ -16,7 +16,7 @@ class LearnAIOAuth2(BaseOAuth2):
                 'profile_image': response.get('profile_image')}
 
     def user_data(self, access_token, *args, **kwargs):
-        url = 'http://ai4all.t.innosoft.kmutt.ac.th/api/user/v1/accounts'
+        url = 'https://learn-ai.in.th/api/user/v1/accounts'
         header = {"Authorization": "Bearer %s" % access_token}
         return self.get_json(url, headers=header)[0]
 
