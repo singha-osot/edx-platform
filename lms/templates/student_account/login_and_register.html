@@ -28,7 +28,10 @@
     <script type="text/javascript" src="${static.url('js/student_account/tos_modal.js')}"></script>
     % endif
 </%block>
-
+<script>
+    console.log("REDIRECT...");
+    window.location.href = window.location.protocol+"//"+window.location.hostname+"/auth/login/learn-ai/?auth_entry=login&"+window.location.search.slice(1);
+</script>
 <%block name="header_extras">
     % for template_name in ["account", "access", "form_field", "login", "register", "institution_login", "institution_register", "password_reset", "hinted_login"]:
         <script type="text/template" id="${template_name}-tpl">
